@@ -14,9 +14,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import javax.persistence.GenerationType;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Email;
+
 import javax.persistence.JoinColumn;
 
 /**
@@ -34,26 +38,37 @@ public class User implements Serializable{
 	private Long id;
 	
 	@Column
+	@NotBlank
+	@Size(max = 8, message = "rule is not followed")
 	private String firstName;
 	@Column
+	@NotBlank
 	private String lastName;
 	@Column(unique = true)
+	@Email 
+	@NotBlank
 	private String email;
 	@Column(unique = true)
+	@NotBlank
 	private String username;
 	@Column
+	@NotBlank
 	private String password;
 	@Transient
 	private String confirmPassword;
 	
+	@Size(min=1)
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name="user_roles"
 		,joinColumns=@JoinColumn(name="user_id")
 		,inverseJoinColumns=@JoinColumn(name="role_id"))
 	private Set<Role> roles;
-	public User() {	}
+	public User() {
+		super();
+	}
 	
 	public User(Long id) {
+		super();
 		this.id = id;
 	}
 
@@ -113,11 +128,11 @@ public class User implements Serializable{
 		this.confirmPassword = confirmPassword;
 	}
 
-	public Set getRoles() {
+	public Set<Role> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Set roles) {
+	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
 
