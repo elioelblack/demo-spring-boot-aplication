@@ -39,7 +39,7 @@ public class User implements Serializable{
 	
 	@Column
 	@NotBlank
-	@Size(max = 8, message = "rule is not followed")
+	@Size(max = 255, message = "rule is not followed")
 	private String firstName;
 	@Column
 	@NotBlank
