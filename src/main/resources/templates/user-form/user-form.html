@@ -64,6 +64,8 @@
 			<a class="btn btn-secondary"  th:href="@{'/userForm/cancel'}">Cancel</a>
 			<input type="submit" class="btn btn-primary"
 				value="Save Changes" th:value="${editMode}?'Save User':'Create User'">
+			<button type="button" class="btn btn-secondary" data-toggle="modal" th:if="${editMode}" data-target="#changePasswordModal">Change Password</button>
+
 		</div>
 	</div>
 	<div class="alert alert-danger text-center" th:if="${formErrorMessage}" th:text="${formErrorMessage}">Error MEssage</div>

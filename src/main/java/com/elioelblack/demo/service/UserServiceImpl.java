@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.elioelblack.demo.model.User;
+import com.elioelblack.demo.pojo.ChangePasswordForm;
 import com.elioelblack.demo.repository.UserRepository;
 import com.elioelblack.demo.service.UserService;
 /**
@@ -77,9 +78,28 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public void deleteUser(Long id) throws Exception {
 		User user = repository.findById(id)
-				.orElseThrow(() -> new Exception("UsernotFound in deleteUser -"+this.getClass().getName()));
-		
+				.orElseThrow(() -> new Exception("UsernotFound in deleteUser -"+this.getClass().getName()));		
 		repository.delete(user);
+	}
+
+	@Override
+	public User changePassword(ChangePasswordForm form) throws Exception {
+		User storedUser = repository.findById(form.getId())
+				.orElseThrow(()->new Exception("User not foud in ChangePassword - "+getClass().getName()));
+		System.out.println("Current="+form.getCurrentPassword()+"  // "
+				+ "Guardado = "+storedUser.getPassword());
+		if(!form.getCurrentPassword().equals(storedUser.getPassword())) {
+			throw new Exception("Current password incorrect");
+		}
+		if(form.getCurrentPassword().equals(form.getNewPassword())) {
+			throw new Exception("New password must be diferent than current password");
+		}
+		if(!form.getNewPassword().equals(form.getConfirmPassword())) {
+			throw new Exception("New Password and confirm Password does not match");
+		}
+		storedUser.setPassword(form.getNewPassword());
+		
+		return repository.save(storedUser);
 	}
 
 }
