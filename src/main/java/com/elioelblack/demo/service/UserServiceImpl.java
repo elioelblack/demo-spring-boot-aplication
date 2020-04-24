@@ -5,6 +5,10 @@ package com.elioelblack.demo.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.elioelblack.demo.model.User;
@@ -19,6 +23,9 @@ import com.elioelblack.demo.service.UserService;
 public class UserServiceImpl implements UserService{
 	@Autowired
 	UserRepository repository;
+	
+	@Autowired
+	BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	@Override
 	public Iterable<User> getAllUsers() {		
@@ -55,6 +62,7 @@ public class UserServiceImpl implements UserService{
 		return user;
 	}
 
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
 	@Override
 	public User updateUser(User user) throws Exception {
 		User toUser = getUserById(user.getId());
@@ -81,14 +89,30 @@ public class UserServiceImpl implements UserService{
 				.orElseThrow(() -> new Exception("UsernotFound in deleteUser -"+this.getClass().getName()));		
 		repository.delete(user);
 	}
+	
+	public boolean isLoggedUserADMIN(){
+		 return loggedUserHasRole("ROLE_ADMIN");
+		}
+	public boolean loggedUserHasRole(String role) {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		UserDetails loggedUser = null;
+		Object roles = null; 
+		if (principal instanceof UserDetails) {
+			loggedUser = (UserDetails) principal;
+		
+			roles = loggedUser.getAuthorities().stream()
+					.filter(x -> role.equals(x.getAuthority() ))      
+					.findFirst().orElse(null); //loggedUser = null;
+		}
+		return roles != null ?true :false;
+	}
 
 	@Override
 	public User changePassword(ChangePasswordForm form) throws Exception {
 		User storedUser = repository.findById(form.getId())
 				.orElseThrow(()->new Exception("User not foud in ChangePassword - "+getClass().getName()));
-		System.out.println("Current="+form.getCurrentPassword()+"  // "
-				+ "Guardado = "+storedUser.getPassword());
-		if(!form.getCurrentPassword().equals(storedUser.getPassword())) {
+		
+		if(!isLoggedUserADMIN() && !form.getCurrentPassword().equals(storedUser.getPassword())) {
 			throw new Exception("Current password incorrect");
 		}
 		if(form.getCurrentPassword().equals(form.getNewPassword())) {
@@ -97,8 +121,8 @@ public class UserServiceImpl implements UserService{
 		if(!form.getNewPassword().equals(form.getConfirmPassword())) {
 			throw new Exception("New Password and confirm Password does not match");
 		}
-		storedUser.setPassword(form.getNewPassword());
-		
+		String encodePassword = bCryptPasswordEncoder.encode(form.getNewPassword());
+		storedUser.setPassword(encodePassword);
 		return repository.save(storedUser);
 	}
 

@@ -20,51 +20,33 @@
 </head>
 <body>
     <div class="modal-dialog text-center">
-        <div class="container-fluid">
-        <div class="d-flex justify-content-center h-100">
-            <div class="card tarjeta">
-                <div class="card-header">
-                    <div class="d-flex justify-content-left social_icon">
-                        <img src="static/img/avatar-png-7.png" th:src="@{/img/avatar-png-7.png}" class="user-image">
-                    </div>
-                    <h3 style="margin-top: 20px;">Iniciar Sesión</h3>
-                    
+        <div class="col-sm-8 main-section">
+            <div class="modal-content">
+                <div class="col-12 user-img">
+                    <img src="static/img/user.png" th:src="@{/img/user.png}"/>
                 </div>
-                <div class="card-body">
-                    <form>
-                        <div class="input-group form-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Nombre de usuario">
-                            
-                        </div>
-                        <div class="input-group form-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-key"></i></span>
-                            </div>
-                            <input type="password" class="form-control" placeholder="Contraseña">
-                        </div>      
-                        <div class="row align-items-center remember">
-                            <input type="checkbox">Recordarme
-                        </div>                  
-                        <div class="form-group">
-                            <input type="submit" value="Entrar" class="btn float-left login_btn">
-                        </div>                       
-                    </form>
-                </div>
-                <div class="card-footer">
-                    <div class="d-flex justify-content-center links">
-                        ¿No tienes una cuenta?<a href="#">Registrarse</a>
+                <form class="col-12" th:action="@{/login}" method="post">
+                    <div class="form-group" id="user-group">
+                        <input type="text" class="form-control" placeholder="Nombre de usuario" name="username"/>
                     </div>
-                    <div class="d-flex justify-content-center">
-                        <a href="#">Recuperar contraseña</a>
+                    <div class="form-group" id="contrasena-group">
+                        <input type="password" class="form-control" placeholder="Contrasena" name="password"/>
                     </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i>  Ingresar </button>
+                </form>
+                <div class="col-12 forgot">
+                    <p><a href="#">Recordar contrasena?</a></p>
+                    <p><a href="#" th:href="@{/signup}">Crear Usuario - Registrarse</a>
                 </div>
+                <div th:if="${param.error}" class="alert alert-danger" role="alert">
+		            Invalid username and password.
+		        </div>
+		        <div th:if="${param.logout}" class="alert alert-success" role="alert">
+		            You have been logged out.
+		        </div>
             </div>
         </div>
     </div>
-
 </body>
 
 </html>
